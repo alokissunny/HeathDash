@@ -6,6 +6,7 @@ import {
   Link
 } from "react-router-dom";
 import Dash from './components/DashboardLayoutComponent/Dashlayout';
+import Detail from "./pages/DetailComponent";
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -50,6 +51,9 @@ export default function BasicExample() {
           </Route>
           <Route path="/dashboard">
             <Dashboard />
+          </Route>
+          <Route path="/details/:id">
+            <Detail />
           </Route>
         </Switch>
       </div>

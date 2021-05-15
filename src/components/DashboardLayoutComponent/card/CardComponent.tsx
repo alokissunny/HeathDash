@@ -14,13 +14,13 @@ import { red } from '@material-ui/core/colors';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-// import MoreVertIcon from '@material-ui/icons/MoreVert';
-// import Zoomin from '@material-ui/icons/ZoomIn';
 import  Fullscreen from '@material-ui/icons/Fullscreen';
 import { Chart } from "react-google-charts";
 import EditIcon  from '@material-ui/icons/Edit';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import BarChartIcon from '@material-ui/icons/BarChart';
+import { useHistory } from "react-router-dom";
+
 const useStyles = makeStyles((theme: Theme) =>
 createStyles({
 root: {
@@ -47,13 +47,16 @@ avatar: {
 );
 
 export default function RecipeReviewCard(props:any) {
+const history = useHistory();
 const classes = useStyles();
 const [expanded, setExpanded] = React.useState(false);
 
 const handleExpandClick = () => {
 setExpanded(!expanded);
 };
-
+const fullScreen = ()=> {
+  history.push('/details/'+props.test);
+}
 return (
 <Card className={classes.root}>
     <CardHeader
@@ -64,7 +67,7 @@ return (
     }
     action={
       <IconButton aria-label="settings">
-        <Fullscreen />
+        <Fullscreen onClick={fullScreen}/>
       </IconButton>
     }
     title={props.test}
