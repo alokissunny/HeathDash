@@ -2,20 +2,51 @@ import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
+  Redirect,
   Route,
-  Link
+  Link,
+  useHistory,
+  useLocation
 } from "react-router-dom";
 import Dash from './components/DashboardLayoutComponent/Dashlayout';
 import Detail from "./pages/DetailComponent";
 
-// This site has 3 pages, all of which are rendered
-// dynamically in the browser (not server rendered).
-//
-// Although the page does not ever refresh, notice how
-// React Router keeps the URL up to date as you navigate
-// through the site. This preserves the browser history,
-// making sure things like the back button and bookmarks
-// work properly.
+const fakeAuth = {
+  isAuthenticated: false,
+  authenticate(cb) {
+    this.isAuthenticated = true
+    setTimeout(cb, 100) // fake async
+  },
+  signout(cb) {
+    this.isAuthenticated = false
+    setTimeout(cb, 100) // fake async
+  }
+}
+
+function PrivateRoute({ children, ...rest }) {
+  return (
+    <Route {...rest} render={({ location }) => {
+      return fakeAuth.isAuthenticated === true
+        ? children
+        : <Redirect to={{
+            pathname: '/login',
+            state: { from: location }
+          }} />
+    }} />
+  )
+}
+
+function AuthButton () {
+  const history = useHistory()
+
+  return fakeAuth.isAuthenticated === true
+    ? <p>
+        Welcome! <button onClick={() => {
+          fakeAuth.signout(() => history.push('/'))
+        }}>Sign out</button>
+      </p>
+    : <p>You are not logged in.</p>
+}
 
 export default function BasicExample() {
   return (
@@ -43,26 +74,50 @@ export default function BasicExample() {
           of them to render at a time
         */}
         <Switch>
+        <Route path="/login">
+            <Login />
+          </Route>
           <Route exact path="/">
             <Home />
           </Route>
           <Route path="/about">
             <About />
           </Route>
-          <Route path="/dashboard">
+          <PrivateRoute path="/dashboard">
             <Dashboard />
-          </Route>
-          <Route path="/details/:id">
+          </PrivateRoute>
+          <PrivateRoute path="/details/:id">
             <Detail />
-          </Route>
+          </PrivateRoute>
         </Switch>
       </div>
     </Router>
   );
 }
 
-// You can think of these components as "pages"
-// in your app.
+function Login() {
+  const [
+    redirectToReferrer,
+    setRedirectToReferrer
+  ] = React.useState(false)
+
+  const { state } = useLocation()
+
+  const login = () => fakeAuth.authenticate(() => {
+    setRedirectToReferrer(true)
+  })
+
+  if (redirectToReferrer === true) {
+    return <Redirect to={state?.from || '/'} />
+  }
+
+  return (
+    <div>
+      <p>You must log in to view the page</p>
+      <button onClick={login}>Log in</button>
+    </div>
+  )
+}
 
 function Home() {
   return (
